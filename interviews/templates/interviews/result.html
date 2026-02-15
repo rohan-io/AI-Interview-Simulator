@@ -1,0 +1,78 @@
+{% extends 'interviews/base.html' %}
+
+{% block content %}
+
+<h2>Interview Result</h2>
+
+<!-- Overall Score -->
+<div class="card">
+    <h3>Your Overall Score: {{ session.overall_score }}%</h3>
+</div>
+
+<!-- Performance Chart -->
+<div class="card">
+    <h3>Performance Chart</h3>
+
+    <div style="height:400px;">
+        <canvas id="resultChart"></canvas>
+    </div>
+</div>
+
+<!-- AI Feedback -->
+<div class="card">
+    <h3>AI Feedback</h3>
+
+    {% for fb in feedback %}
+        <div style="margin-bottom:20px;">
+            <h4>Question {{ forloop.counter }}</h4>
+
+            <p><strong>Score:</strong> {{ fb.score }}</p>
+            <p><strong>Strengths:</strong> {{ fb.strengths }}</p>
+            <p><strong>Weaknesses:</strong> {{ fb.weaknesses }}</p>
+            <p><strong>Improvement:</strong> {{ fb.improvement }}</p>
+
+            <hr>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const canvas = document.getElementById('resultChart');
+    const ctx = canvas.getContext('2d');
+
+    const labels = {{ labels_json|safe }};
+    const scores = {{ scores_json|safe }};
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Question Score',
+                data: scores,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

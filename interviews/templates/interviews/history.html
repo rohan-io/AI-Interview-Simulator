@@ -1,0 +1,81 @@
+{% extends 'interviews/base.html' %}
+
+{% block content %}
+
+<h2>Interview History</h2>
+
+
+<div class="stats-container">
+    <div class="stat-card">
+        <h3>Total Interviews</h3>
+        <p>{{ total_interviews }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Average Score</h3>
+        <p>{{ average_score }}%</p>
+    </div>
+    <div class="stat-card">
+        <h3>Highest Score</h3>
+        <p>{{ highest_score }}%</p>
+    </div>
+</div>
+
+<div class="chart-container">
+    <canvas id="historyChart"></canvas>
+</div>
+
+<div class="interview-list">
+    {% for session in sessions %}
+        <div class="interview-card">
+            <h3>{{ session.role }} Interview</h3>
+            <p>Difficulty: {{ session.difficulty }}</p>
+            <p>Date: {{ session.start_time|date:"M d, Y" }}</p>
+            <p>Score: {{ session.overall_score }}%</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const canvas = document.getElementById('historyChart');
+
+    if (!canvas) {
+        console.error("Canvas not found");
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    const labels = {{ labels_json|safe }};
+    const scores = {{ scores_json|safe }};
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Score Trend',
+                data: scores,
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+});
+</script>
+{% endblock %}

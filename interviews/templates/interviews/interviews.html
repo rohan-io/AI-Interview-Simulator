@@ -1,0 +1,40 @@
+{% extends 'interviews/base.html' %}
+
+{% block content %}
+
+<h2>Interview Session</h2>
+
+<div class="card">
+    <p><strong>Role:</strong> {{ role|title }}</p>
+    <p><strong>Difficulty:</strong> {{ difficulty|title }}</p>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {% for question in questions %}
+        <div class="card">
+            <h4>Question {{ forloop.counter }}</h4>
+
+            <!-- LLM Generated Question -->
+            <p>{{ question }}</p>
+
+            <!-- IMPORTANT CHANGE -->
+            <textarea 
+                name="answer_{{ forloop.counter0 }}"
+                rows="4"
+                style="width:100%; padding:8px;"
+                placeholder="Type your answer here..."
+                required>
+            </textarea>
+
+        </div>
+    {% endfor %}
+
+    <div style="text-align:center; margin-top:20px;">
+        <button type="submit">Submit Interview</button>
+    </div>
+
+</form>
+
+{% endblock %}

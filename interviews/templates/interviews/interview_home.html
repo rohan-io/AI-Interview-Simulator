@@ -1,0 +1,115 @@
+{% extends 'interviews/base.html' %}
+
+{% block content %}
+
+<h2>Select Interview Options</h2>
+
+<div class="card">
+    <form method="GET" action="{% url 'start_interview' %}">
+
+        <div style="margin-bottom:15px;">
+            <label for="role"><strong>Select Role:</strong></label><br>
+            <select id="role" name="role" required>
+                <option value="">Select Role</option>
+                <option value="backend">Backend Developer</option>
+                <option value="frontend">Frontend Developer</option>
+                <option value="data">Data Analyst</option>
+                <option value="devops">DevOps Engineer</option>
+                <option value="fullstack">Full Stack Developer</option>
+            </select>
+        </div>
+        <div style="margin-bottom:15px;">
+            <label for="tech_stack"><strong>Select Specialization:</strong></label><br>
+            <select id="tech_stack" name="tech_stack" required>
+                <option value="">Select Role First</option>
+                <!-- Backend -->
+                <option value="django">Django</option>
+                <option value="nodejs">Node.js</option>
+                <option value="springboot">Spring Boot</option>
+
+                <!-- Frontend -->
+                <option value="react">React</option>
+                <option value="angular">Angular</option>
+                <option value="vue">Vue</option>
+
+                <!-- Data -->
+                <option value="sql">SQL</option>
+                <option value="python">Python (Data)</option>
+
+                <!-- DevOps -->
+                <option value="aws">AWS</option>
+                <option value="docker">Docker</option>
+
+            </select>
+        </div>
+        <div style="margin-bottom:15px;">
+            <label for="difficulty"><strong>Select Difficulty:</strong></label><br>
+            <select name="difficulty" required style="padding:6px; width:200px;">
+                <option value="">-- Select Difficulty --</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+
+        <button type="submit">Start Interview</button>
+
+    </form>
+</div>
+<script>
+
+const techOptions = {
+
+    backend: [
+        "Django",
+        "Node.js",
+        "Spring Boot"
+    ],
+
+    frontend: [
+        "React",
+        "Angular",
+        "Vue"
+    ],
+
+    data: [
+        "Python",
+        "SQL"
+    ],
+
+    devops: [
+        "AWS",
+        "Docker"
+    ],
+
+    fullstack: [
+        "Python + React",
+        "Java + Angular"
+    ]
+};
+
+document.getElementById("role").addEventListener("change", function () {
+
+    const role = this.value;
+    const techDropdown = document.getElementById("tech_stack");
+
+    techDropdown.innerHTML = "";
+
+    if (techOptions[role]) {
+
+        techOptions[role].forEach(function (tech) {
+
+            let option = document.createElement("option");
+            option.value = tech.toLowerCase();
+            option.text = tech;
+
+            techDropdown.appendChild(option);
+
+        });
+    }
+});
+
+</script>
+
+
+{% endblock %}
