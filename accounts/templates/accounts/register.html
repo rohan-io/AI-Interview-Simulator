@@ -1,0 +1,67 @@
+{% extends 'accounts/auth_base.html' %}
+
+{% block content %}
+
+<h3>Create Account</h3>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.username }}
+    {{ form.email }}
+
+    <!-- PASSWORD 1 -->
+    <div class="password-wrapper">
+
+        <div class="password-box">
+            {{ form.password1 }}
+            <i class="bi bi-eye-slash toggle-eye" id="togglePassword"></i>
+        </div>
+
+        <small id="pass-rules" class="rules">
+            • Minimum 8 characters <br>
+            • At least 1 uppercase letter <br>
+            • At least 1 number <br>
+            • Cannot be similar to username
+        </small>
+
+    </div>
+
+    <!-- PASSWORD 2 -->
+    {{ form.password2 }}
+
+    <button type="submit">Register</button>
+
+</form>
+
+<div class="switch">
+    Already have an account?
+    <a href="{% url 'login' %}">Login</a>
+</div>
+
+<!-- PASSWORD RULE + TOGGLE SCRIPT -->
+<script>
+
+const password1 = document.getElementById("password1");
+const rules = document.getElementById("pass-rules");
+const togglePassword = document.getElementById("togglePassword");
+
+password1.addEventListener("focus", () => {
+    rules.style.display = "block";
+});
+
+togglePassword.addEventListener("click", function () {
+
+    const type = password1.getAttribute("type") === "password"
+        ? "text"
+        : "password";
+
+    password1.setAttribute("type", type);
+
+    this.classList.toggle("bi-eye");
+    this.classList.toggle("bi-eye-slash");
+});
+
+</script>
+
+{% endblock %}

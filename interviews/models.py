@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class InterviewSession(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     role = models.CharField(max_length=50)
-    tech_stack = models.CharField(max_length=50)   # 👈 ADD THIS
+    tech_stack = models.CharField(max_length=50)  
     difficulty = models.CharField(max_length=50)
     overall_score = models.FloatField(default=0)
     start_time = models.DateTimeField(auto_now_add=True)
