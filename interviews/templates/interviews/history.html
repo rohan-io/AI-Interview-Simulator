@@ -2,43 +2,137 @@
 
 {% block content %}
 
-<h2>Interview History</h2>
-
-
-<div class="stats-container">
-    <div class="stat-card">
-        <h3>Total Interviews</h3>
-        <p>{{ total_interviews }}</p>
-    </div>
-    <div class="stat-card">
-        <h3>Average Score</h3>
-        <p>{{ average_score }}%</p>
-    </div>
-    <div class="stat-card">
-        <h3>Highest Score</h3>
-        <p>{{ highest_score }}%</p>
-    </div>
+<div class="page-header">
+    <h2>Interview History</h2>
+    <p>Track your progress and performance over time</p>
 </div>
 
-<div class="chart-container">
-    <canvas id="historyChart"></canvas>
+<!-- Statistics Cards -->
+<div style="max-width: 1200px; margin: 0 auto 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+    
+    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center;">
+        <div style="font-size: 50px; margin-bottom: 15px;">📝</div>
+        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Total Interviews</p>
+        <h2 style="font-size: 48px; font-weight: 700; margin: 0;">{{ total_interviews }}</h2>
+    </div>
+
+    <div class="card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-align: center;">
+        <div style="font-size: 50px; margin-bottom: 15px;">📊</div>
+        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Average Score</p>
+        <h2 style="font-size: 48px; font-weight: 700; margin: 0;">{{ average_score }}%</h2>
+    </div>
+
+    <div class="card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; text-align: center;">
+        <div style="font-size: 50px; margin-bottom: 15px;">🏆</div>
+        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Highest Score</p>
+        <h2 style="font-size: 48px; font-weight: 700; margin: 0;">{{ highest_score }}%</h2>
+    </div>
+
 </div>
 
-<div class="interview-list">
-    {% for session in sessions %}
-        <div class="interview-card">
-            <h3>{{ session.role }} Interview</h3>
-            <p>Difficulty: {{ session.difficulty }}</p>
-            <p>Date: {{ session.start_time|date:"M d, Y" }}</p>
-            <p>Score: {{ session.overall_score }}%</p>
+<!-- Performance Trend Chart -->
+{% if sessions %}
+<div class="card" style="max-width: 1200px; margin: 0 auto 40px;">
+    <h3 style="margin-bottom: 25px; color: #2d3748; display: flex; align-items: center; gap: 10px; font-size: 22px;">
+        <span style="font-size: 28px;">📈</span>
+        Performance Trend
+    </h3>
+    <div class="chart-container" style="height: 400px;">
+        <canvas id="historyChart"></canvas>
+    </div>
+</div>
+{% endif %}
+
+<!-- Interview List -->
+<div style="max-width: 1200px; margin: 0 auto;">
+    <h3 style="margin-bottom: 25px; color: white; text-align: center; font-size: 28px;">
+        📋 All Interviews
+    </h3>
+
+    {% if sessions %}
+        <div style="display: grid; gap: 20px;">
+            {% for session in sessions %}
+                <div class="card interview-card" style="transition: all 0.3s ease;">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                        
+                        <!-- Left Section: Interview Details -->
+                        <div style="flex: 1; min-width: 250px;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 28px;">
+                                    {% if session.role == 'backend' %}💻
+                                    {% elif session.role == 'frontend' %}🎨
+                                    {% elif session.role == 'data' %}📊
+                                    {% elif session.role == 'devops' %}⚙️
+                                    {% else %}🚀{% endif %}
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0 0 5px 0; color: #2d3748; font-size: 20px;">{{ session.role|title }} Developer</h4>
+                                    <p style="margin: 0; color: #718096; font-size: 14px;">{{ session.start_time|date:"F d, Y" }} at {{ session.start_time|date:"h:i A" }}</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <span style="background: #e2e8f0; color: #2d3748; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                    {% if session.difficulty == 'easy' %}🟢
+                                    {% elif session.difficulty == 'medium' %}🟡
+                                    {% else %}🔴{% endif %}
+                                    {{ session.difficulty|title }}
+                                </span>
+                                <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                    ⏱️ {{ session.duration }} mins
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right Section: Score -->
+                        <div style="text-align: center; padding: 20px; background: 
+                            {% if session.overall_score >= 80 %}linear-gradient(135deg, #10b981, #059669)
+                            {% elif session.overall_score >= 60 %}linear-gradient(135deg, #f59e0b, #d97706)
+                            {% else %}linear-gradient(135deg, #ef4444, #dc2626){% endif %};
+                            border-radius: 16px; color: white; min-width: 140px;">
+                            <p style="margin: 0 0 5px 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Score</p>
+                            <h3 style="margin: 0; font-size: 40px; font-weight: 700;">{{ session.overall_score }}%</h3>
+                            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">
+                                {% if session.overall_score >= 80 %}Excellent!
+                                {% elif session.overall_score >= 60 %}Good!
+                                {% else %}Keep Learning!{% endif %}
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+    {% else %}
+        <!-- Empty State -->
+        <div class="card" style="text-align: center; padding: 60px 30px;">
+            <div style="font-size: 80px; margin-bottom: 20px; opacity: 0.5;">📝</div>
+            <h3 style="color: #2d3748; margin-bottom: 15px;">No Interviews Yet</h3>
+            <p style="color: #718096; margin-bottom: 30px; font-size: 16px;">Start your first interview to see your progress here!</p>
+            <a href="{% url 'interview_home' %}" style="text-decoration: none;">
+                <button style="padding: 15px 40px; font-size: 16px;">
+                    Start Your First Interview
+                </button>
+            </a>
+        </div>
+    {% endif %}
+
 </div>
+
+<style>
+    .interview-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+</style>
 
 {% endblock %}
 
 
 {% block scripts %}
+{% if sessions %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -54,6 +148,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const labels = {{ labels_json|safe }};
     const scores = {{ scores_json|safe }};
 
+    // Create gradient for line
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.5)');
+    gradient.addColorStop(1, 'rgba(118, 75, 162, 0.1)');
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -61,16 +160,80 @@ document.addEventListener("DOMContentLoaded", function () {
             datasets: [{
                 label: 'Score Trend',
                 data: scores,
-                borderWidth: 2,
-                fill: false
+                borderColor: '#667eea',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: '#764ba2',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 3
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#2d3748',
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Score: ' + context.parsed.y + '%';
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 100
+                    max: 100,
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        display: false
+                    }
                 }
             }
         }
@@ -78,4 +241,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+{% endif %}
 {% endblock %}

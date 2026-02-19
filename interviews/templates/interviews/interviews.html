@@ -2,39 +2,240 @@
 
 {% block content %}
 
-<h2>Interview Session</h2>
-
-<div class="card">
-    <p><strong>Role:</strong> {{ role|title }}</p>
-    <p><strong>Difficulty:</strong> {{ difficulty|title }}</p>
+<div class="page-header">
+    <h2>Interview Session</h2>
+    <p>Take your time and answer thoughtfully</p>
 </div>
 
-<form method="POST">
+<div class="card" style="max-width: 900px; margin: 0 auto 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <p style="font-size: 14px; color: #718096; margin-bottom: 5px;">INTERVIEW DETAILS</p>
+            <h3 style="color: #2d3748; font-size: 24px; margin: 0;">
+                {{ role|title }} - {{ difficulty|title }}
+            </h3>
+        </div>
+        <div style="text-align: right;">
+            <p style="font-size: 14px; color: #718096; margin-bottom: 5px;">PROGRESS</p>
+            <p style="font-size: 24px; font-weight: 700; color: #667eea; margin: 0;">
+                <span id="currentQuestion">0</span> / {{ questions|length }}
+            </p>
+        </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div style="margin-top: 20px; background: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden;">
+        <div id="progressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s ease;"></div>
+    </div>
+</div>
+
+<form method="POST" id="interviewForm">
     {% csrf_token %}
 
     {% for question in questions %}
-        <div class="card">
-            <h4>Question {{ forloop.counter }}</h4>
+        <div class="card question-card" data-question="{{ forloop.counter }}" style="max-width: 900px; margin: 0 auto 25px; display: none;">
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; flex-shrink: 0;">
+                    {{ forloop.counter }}
+                </div>
+                <h3 style="color: #2d3748; margin: 0; font-size: 18px;">Question {{ forloop.counter }} of {{ questions|length }}</h3>
+            </div>
 
-            <!-- LLM Generated Question -->
-            <p>{{ question }}</p>
+            <div style="background: #f7fafc; padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid #667eea;">
+                <p style="font-size: 17px; line-height: 1.7; color: #2d3748; margin: 0; white-space: pre-wrap;">{{ question }}</p>
+            </div>
 
-            <!-- IMPORTANT CHANGE -->
-            <textarea 
-                name="answer_{{ forloop.counter0 }}"
-                rows="4"
-                style="width:100%; padding:8px;"
-                placeholder="Type your answer here..."
-                required>
-            </textarea>
+            <div>
+                <label for="answer_{{ forloop.counter0 }}" style="margin-bottom: 12px;">
+                    <span style="font-size: 18px;">✍️</span> Your Answer
+                </label>
+                <textarea 
+                    name="answer_{{ forloop.counter0 }}"
+                    id="answer_{{ forloop.counter0 }}"
+                    rows="6"
+                    placeholder="Type your detailed answer here... Be specific and provide examples where possible."
+                    required
+                    style="font-size: 15px; line-height: 1.6;">
+                </textarea>
+                <p style="font-size: 13px; color: #718096; margin-top: 8px;">
+                    <span id="charCount_{{ forloop.counter0 }}">0</span> characters
+                </p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 25px; gap: 15px;">
+                {% if forloop.first %}
+                    <div></div>
+                {% else %}
+                    <button type="button" class="btn-secondary prev-btn" data-question="{{ forloop.counter }}">
+                        ← Previous
+                    </button>
+                {% endif %}
+                
+                {% if forloop.last %}
+                    <button type="button" class="next-btn" data-question="{{ forloop.counter }}" style="margin-left: auto;" onclick="showSubmitConfirm()">
+                        Submit Interview
+                    </button>
+                {% else %}
+                    <button type="button" class="next-btn" data-question="{{ forloop.counter }}" style="margin-left: auto;">
+                        Next Question →
+                    </button>
+                {% endif %}
+            </div>
 
         </div>
     {% endfor %}
 
-    <div style="text-align:center; margin-top:20px;">
-        <button type="submit">Submit Interview</button>
-    </div>
-
 </form>
+
+<!-- Submit Confirmation Modal -->
+<div id="submitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 40px; border-radius: 20px; max-width: 500px; margin: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+        <div style="font-size: 60px; margin-bottom: 20px;">🎯</div>
+        <h3 style="margin-bottom: 15px; color: #2d3748;">Ready to Submit?</h3>
+        <p style="color: #718096; margin-bottom: 30px; line-height: 1.6;">
+            You've answered all questions. Once you submit, your interview will be evaluated by our AI system.
+        </p>
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button type="button" onclick="closeSubmitModal()" class="btn-secondary">
+                Review Answers
+            </button>
+            <button type="button" onclick="submitInterview()">
+                Submit Now
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #2d3748;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-secondary:hover {
+        background: #cbd5e0;
+        transform: translateY(-2px);
+    }
+
+    .question-card {
+        opacity: 0;
+        animation: fadeInQuestion 0.5s ease forwards;
+    }
+
+    @keyframes fadeInQuestion {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+let currentQuestion = 1;
+const totalQuestions = {{ questions|length }};
+
+// Show first question on load
+document.addEventListener('DOMContentLoaded', function() {
+    showQuestion(1);
+    updateProgress();
+    
+    // Add character counter to all textareas
+    document.querySelectorAll('textarea').forEach((textarea, index) => {
+        textarea.addEventListener('input', function() {
+            document.getElementById('charCount_' + index).textContent = this.value.length;
+        });
+    });
+});
+
+function showQuestion(questionNumber) {
+    // Hide all questions
+    document.querySelectorAll('.question-card').forEach(card => {
+        card.style.display = 'none';
+    });
+    
+    // Show current question
+    const currentCard = document.querySelector(`[data-question="${questionNumber}"]`);
+    if (currentCard) {
+        currentCard.style.display = 'block';
+        currentCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    currentQuestion = questionNumber;
+    updateProgress();
+}
+
+function updateProgress() {
+    document.getElementById('currentQuestion').textContent = currentQuestion;
+    const progressPercent = (currentQuestion / totalQuestions) * 100;
+    document.getElementById('progressBar').style.width = progressPercent + '%';
+}
+
+// Next button handlers
+document.querySelectorAll('.next-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const questionNum = parseInt(this.dataset.question);
+        const textarea = document.getElementById('answer_' + (questionNum - 1));
+        
+        if (!textarea.value.trim()) {
+            alert('Please provide an answer before proceeding.');
+            textarea.focus();
+            return;
+        }
+        
+        if (questionNum < totalQuestions) {
+            showQuestion(questionNum + 1);
+        }
+    });
+});
+
+// Previous button handlers
+document.querySelectorAll('.prev-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const questionNum = parseInt(this.dataset.question);
+        if (questionNum > 1) {
+            showQuestion(questionNum - 1);
+        }
+    });
+});
+
+function showSubmitConfirm() {
+    // Check if all questions are answered
+    let allAnswered = true;
+    document.querySelectorAll('textarea').forEach(textarea => {
+        if (!textarea.value.trim()) {
+            allAnswered = false;
+        }
+    });
+    
+    if (!allAnswered) {
+        alert('Please answer all questions before submitting.');
+        return;
+    }
+    
+    document.getElementById('submitModal').style.display = 'flex';
+}
+
+function closeSubmitModal() {
+    document.getElementById('submitModal').style.display = 'none';
+}
+
+function submitInterview() {
+    document.getElementById('interviewForm').submit();
+}
+
+// Prevent accidental page leave
+window.addEventListener('beforeunload', function (e) {
+    e.preventDefault();
+    e.returnValue = '';
+});
+</script>
 
 {% endblock %}

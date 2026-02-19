@@ -2,114 +2,172 @@
 
 {% block content %}
 
-<h2>Select Interview Options</h2>
+<div class="page-header">
+    <h2>Select Interview Options</h2>
+    <p>Customize your interview experience and get started</p>
+</div>
 
-<div class="card">
-    <form method="GET" action="{% url 'start_interview' %}">
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <form method="GET" action="{% url 'start_interview' %}" id="interviewForm">
 
-        <div style="margin-bottom:15px;">
-            <label for="role"><strong>Select Role:</strong></label><br>
+        <div style="margin-bottom: 30px;">
+            <label for="role">
+                <span style="font-size: 18px;">👔</span> Select Role
+            </label>
             <select id="role" name="role" required>
-                <option value="">Select Role</option>
-                <option value="backend">Backend Developer</option>
-                <option value="frontend">Frontend Developer</option>
-                <option value="data">Data Analyst</option>
-                <option value="devops">DevOps Engineer</option>
-                <option value="fullstack">Full Stack Developer</option>
-            </select>
-        </div>
-        <div style="margin-bottom:15px;">
-            <label for="tech_stack"><strong>Select Specialization:</strong></label><br>
-            <select id="tech_stack" name="tech_stack" required>
-                <option value="">Select Role First</option>
-                <!-- Backend -->
-                <option value="django">Django</option>
-                <option value="nodejs">Node.js</option>
-                <option value="springboot">Spring Boot</option>
-
-                <!-- Frontend -->
-                <option value="react">React</option>
-                <option value="angular">Angular</option>
-                <option value="vue">Vue</option>
-
-                <!-- Data -->
-                <option value="sql">SQL</option>
-                <option value="python">Python (Data)</option>
-
-                <!-- DevOps -->
-                <option value="aws">AWS</option>
-                <option value="docker">Docker</option>
-
-            </select>
-        </div>
-        <div style="margin-bottom:15px;">
-            <label for="difficulty"><strong>Select Difficulty:</strong></label><br>
-            <select name="difficulty" required style="padding:6px; width:200px;">
-                <option value="">-- Select Difficulty --</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
+                <option value="">Choose your role...</option>
+                <option value="backend">💻 Backend Developer</option>
+                <option value="frontend">🎨 Frontend Developer</option>
+                <option value="data">📊 Data Analyst</option>
+                <option value="devops">⚙️ DevOps Engineer</option>
+                <option value="fullstack">🚀 Full Stack Developer</option>
             </select>
         </div>
 
-        <button type="submit">Start Interview</button>
+        <div style="margin-bottom: 30px;">
+            <label for="tech_stack">
+                <span style="font-size: 18px;">🛠️</span> Select Specialization
+            </label>
+            <select id="tech_stack" name="tech_stack" required disabled>
+                <option value="">Select a role first...</option>
+            </select>
+            <p style="font-size: 13px; color: #718096; margin-top: 8px; font-style: italic;">
+                Choose a role to see available specializations
+            </p>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <label for="difficulty">
+                <span style="font-size: 18px;">📈</span> Select Difficulty
+            </label>
+            <select id="difficulty" name="difficulty" required>
+                <option value="">Choose difficulty level...</option>
+                <option value="easy">🟢 Easy - Fundamental concepts</option>
+                <option value="medium">🟡 Medium - Intermediate knowledge</option>
+                <option value="hard">🔴 Hard - Advanced expertise</option>
+            </select>
+        </div>
+
+        <div style="background: #f7fafc; padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #667eea;">
+            <h4 style="margin-bottom: 10px; color: #2d3748; font-size: 16px;">📋 Interview Details</h4>
+            <ul style="list-style: none; color: #4a5568; line-height: 1.8;">
+                <li>✓ 5-7 questions based on your selection</li>
+                <li>✓ AI-powered evaluation and feedback</li>
+                <li>✓ Detailed performance analytics</li>
+                <li>✓ Instant results and recommendations</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center;">
+            <button type="submit" id="startBtn" style="padding: 15px 50px; font-size: 16px;">
+                Start Interview
+            </button>
+        </div>
 
     </form>
 </div>
+
+<style>
+    select option {
+        padding: 10px;
+    }
+
+    select:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    #startBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .form-group-animated {
+        animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>
+
 <script>
 
 const techOptions = {
-
     backend: [
-        "Django",
-        "Node.js",
-        "Spring Boot"
+        { value: "django", label: "🐍 Django" },
+        { value: "nodejs", label: "🟢 Node.js" },
+        { value: "springboot", label: "🍃 Spring Boot" }
     ],
-
     frontend: [
-        "React",
-        "Angular",
-        "Vue"
+        { value: "react", label: "⚛️ React" },
+        { value: "angular", label: "🅰️ Angular" },
+        { value: "vue", label: "💚 Vue.js" }
     ],
-
     data: [
-        "Python",
-        "SQL"
+        { value: "python", label: "🐍 Python (Data Analysis)" },
+        { value: "sql", label: "📊 SQL" }
     ],
-
     devops: [
-        "AWS",
-        "Docker"
+        { value: "aws", label: "☁️ AWS" },
+        { value: "docker", label: "🐳 Docker" }
     ],
-
     fullstack: [
-        "Python + React",
-        "Java + Angular"
+        { value: "python-react", label: "🐍 Python + React" },
+        { value: "java-angular", label: "☕ Java + Angular" }
     ]
 };
 
-document.getElementById("role").addEventListener("change", function () {
+const roleSelect = document.getElementById("role");
+const techSelect = document.getElementById("tech_stack");
 
+roleSelect.addEventListener("change", function () {
     const role = this.value;
-    const techDropdown = document.getElementById("tech_stack");
-
-    techDropdown.innerHTML = "";
+    
+    // Clear and enable tech dropdown
+    techSelect.innerHTML = "";
+    techSelect.disabled = false;
+    
+    // Add placeholder
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.text = "Choose your specialization...";
+    techSelect.appendChild(placeholderOption);
 
     if (techOptions[role]) {
-
         techOptions[role].forEach(function (tech) {
-
             let option = document.createElement("option");
-            option.value = tech.toLowerCase();
-            option.text = tech;
-
-            techDropdown.appendChild(option);
-
+            option.value = tech.value;
+            option.text = tech.label;
+            techSelect.appendChild(option);
         });
+        
+        // Add animation
+        techSelect.parentElement.classList.add('form-group-animated');
+    } else {
+        techSelect.disabled = true;
+    }
+});
+
+// Form validation
+document.getElementById('interviewForm').addEventListener('submit', function(e) {
+    const role = document.getElementById('role').value;
+    const tech = document.getElementById('tech_stack').value;
+    const difficulty = document.getElementById('difficulty').value;
+    
+    if (!role || !tech || !difficulty) {
+        e.preventDefault();
+        alert('Please fill in all fields before starting the interview.');
     }
 });
 
 </script>
-
 
 {% endblock %}

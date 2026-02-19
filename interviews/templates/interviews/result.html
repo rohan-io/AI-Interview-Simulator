@@ -2,39 +2,170 @@
 
 {% block content %}
 
-<h2>Interview Result</h2>
+<div class="page-header">
+    <h2>Interview Complete!</h2>
+    <p>Here's your detailed performance analysis</p>
+</div>
 
-<!-- Overall Score -->
-<div class="card">
-    <h3>Your Overall Score: {{ session.overall_score }}%</h3>
+<!-- Overall Score Card -->
+<div class="card" style="max-width: 900px; margin: 0 auto 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div style="font-size: 70px; margin-bottom: 15px;">
+        {% if session.overall_score >= 80 %}
+            🎉
+        {% elif session.overall_score >= 60 %}
+            👍
+        {% else %}
+            💪
+        {% endif %}
+    </div>
+    <p style="font-size: 16px; opacity: 0.9; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Your Overall Score</p>
+    <h1 style="font-size: 72px; font-weight: 700; margin: 0;">{{ session.overall_score }}%</h1>
+    <p style="font-size: 18px; margin-top: 15px; opacity: 0.95;">
+        {% if session.overall_score >= 80 %}
+            Excellent Performance! 🌟
+        {% elif session.overall_score >= 60 %}
+            Good Job! Keep Improving! 📈
+        {% else %}
+            Keep Learning! You've Got This! 💪
+        {% endif %}
+    </p>
+</div>
+
+<!-- Performance Summary -->
+<div style="max-width: 900px; margin: 0 auto 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+    
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 10px;">📊</div>
+        <p style="font-size: 14px; color: #718096; margin-bottom: 5px;">Questions Answered</p>
+        <h3 style="font-size: 32px; color: #2d3748; margin: 0;">{{ feedback|length }}</h3>
+    </div>
+
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
+        <p style="font-size: 14px; color: #718096; margin-bottom: 5px;">Average Score</p>
+        <h3 style="font-size: 32px; color: #2d3748; margin: 0;">{{ session.overall_score }}%</h3>
+    </div>
+
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🎯</div>
+        <p style="font-size: 14px; color: #718096; margin-bottom: 5px;">Performance Level</p>
+        <h3 style="font-size: 18px; color: #2d3748; margin: 0;">
+            {% if session.overall_score >= 80 %}
+                Advanced
+            {% elif session.overall_score >= 60 %}
+                Intermediate
+            {% else %}
+                Beginner
+            {% endif %}
+        </h3>
+    </div>
+
 </div>
 
 <!-- Performance Chart -->
-<div class="card">
-    <h3>Performance Chart</h3>
-
-    <div style="height:400px;">
+<div class="card" style="max-width: 900px; margin: 0 auto 30px;">
+    <h3 style="margin-bottom: 20px; color: #2d3748; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 24px;">📈</span>
+        Performance Chart
+    </h3>
+    <div class="chart-container" style="height: 350px;">
         <canvas id="resultChart"></canvas>
     </div>
 </div>
 
-<!-- AI Feedback -->
-<div class="card">
-    <h3>AI Feedback</h3>
+<!-- AI Feedback Section -->
+<div style="max-width: 900px; margin: 0 auto;">
+    <h3 style="margin-bottom: 25px; color: white; text-align: center; font-size: 28px;">
+        🤖 Detailed AI Feedback
+    </h3>
 
     {% for fb in feedback %}
-        <div style="margin-bottom:20px;">
-            <h4>Question {{ forloop.counter }}</h4>
+        <div class="card" style="margin-bottom: 25px;">
+            
+            <!-- Question Header -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">
+                        {{ forloop.counter }}
+                    </div>
+                    <h4 style="margin: 0; color: #2d3748; font-size: 18px;">Question {{ forloop.counter }}</h4>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 14px; color: #718096;">Score:</span>
+                    <div style="background: 
+                        {% if fb.score >= 80 %}#10b981{% elif fb.score >= 60 %}#f59e0b{% else %}#ef4444{% endif %}; 
+                        color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 16px;">
+                        {{ fb.score }}/100
+                    </div>
+                </div>
+            </div>
 
-            <p><strong>Score:</strong> {{ fb.score }}</p>
-            <p><strong>Strengths:</strong> {{ fb.strengths }}</p>
-            <p><strong>Weaknesses:</strong> {{ fb.weaknesses }}</p>
-            <p><strong>Improvement:</strong> {{ fb.improvement }}</p>
+            <!-- Feedback Content -->
+            <div style="display: grid; gap: 20px;">
+                
+                <!-- Strengths -->
+                <div style="background: linear-gradient(to right, #ecfdf5, #f0fdf4); padding: 20px; border-radius: 12px; border-left: 4px solid #10b981;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 24px;">✅</span>
+                        <h5 style="margin: 0; color: #065f46; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Strengths</h5>
+                    </div>
+                    <p style="margin: 0; color: #065f46; line-height: 1.7; font-size: 15px;">{{ fb.strengths }}</p>
+                </div>
 
-            <hr>
+                <!-- Weaknesses -->
+                {% if fb.weaknesses %}
+                <div style="background: linear-gradient(to right, #fef2f2, #fef3f2); padding: 20px; border-radius: 12px; border-left: 4px solid #ef4444;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 24px;">⚠️</span>
+                        <h5 style="margin: 0; color: #991b1b; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Areas to Address</h5>
+                    </div>
+                    <p style="margin: 0; color: #991b1b; line-height: 1.7; font-size: 15px;">{{ fb.weaknesses }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Improvement Tips -->
+                <div style="background: linear-gradient(to right, #eff6ff, #dbeafe); padding: 20px; border-radius: 12px; border-left: 4px solid #3b82f6;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <span style="font-size: 24px;">💡</span>
+                        <h5 style="margin: 0; color: #1e40af; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Improvement Tips</h5>
+                    </div>
+                    <p style="margin: 0; color: #1e40af; line-height: 1.7; font-size: 15px;">{{ fb.improvement }}</p>
+                </div>
+
+            </div>
+
         </div>
     {% endfor %}
+
 </div>
+
+<!-- Action Buttons -->
+<div style="max-width: 900px; margin: 40px auto; text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+    <a href="{% url 'interview_home' %}" style="text-decoration: none;">
+        <button style="padding: 15px 40px; font-size: 16px;">
+            🔄 Take Another Interview
+        </button>
+    </a>
+    <a href="{% url 'interview_history' %}" style="text-decoration: none;">
+        <button class="btn-secondary" style="padding: 15px 40px; font-size: 16px;">
+            📊 View History
+        </button>
+    </a>
+</div>
+
+<style>
+    .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+    }
+</style>
 
 {% endblock %}
 
@@ -45,28 +176,86 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     const canvas = document.getElementById('resultChart');
+    
+    if (!canvas) {
+        console.error("Canvas not found");
+        return;
+    }
+
     const ctx = canvas.getContext('2d');
 
     const labels = {{ labels_json|safe }};
     const scores = {{ scores_json|safe }};
+
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
+    gradient.addColorStop(1, 'rgba(118, 75, 162, 0.8)');
 
     new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Question Score',
+                label: 'Score',
                 data: scores,
-                borderWidth: 1
+                backgroundColor: gradient,
+                borderColor: '#667eea',
+                borderWidth: 2,
+                borderRadius: 8,
+                barThickness: 50
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Score: ' + context.parsed.y + '/100';
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 100
+                    max: 100,
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
                 }
             }
         }
